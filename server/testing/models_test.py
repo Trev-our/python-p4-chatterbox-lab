@@ -6,15 +6,17 @@ from models import db, Message
 class TestMessage:
     '''Message model in models.py'''
 
-    with app.app_context():
-        m = Message.query.filter(
-            Message.body == "Hello 👋"
-            ).filter(Message.username == "Liza")
+    def setup_method(self):
+        '''Setup: remove any existing test messages.'''
+        with app.app_context():
+            m = Message.query.filter(
+                Message.body == "Hello 👋"
+            ).filter(Message.username == "Liza").all()
 
-        for message in m:
-            db.session.delete(message)
+            for message in m:
+                db.session.delete(message)
 
-        db.session.commit()
+            db.session.commit()
 
     def test_has_correct_columns(self):
         '''has columns for message body, username, and creation time.'''
@@ -27,6 +29,6 @@ class TestMessage:
             db.session.add(hello_from_liza)
             db.session.commit()
 
-            assert(hello_from_liza.body == "Hello 👋")
-            assert(hello_from_liza.username == "Liza")
-            assert(type(hello_from_liza.created_at) == datetime)
+            assert hello_from_liza.body == "Hello 👋"
+            assert hello_from_liza.username == "Liza"
+            assert isinstance(hello_from_liza.created_at, datetime)
